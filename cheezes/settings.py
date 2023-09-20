@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import os
 import dj_database_url
 from pathlib import Path
 
@@ -20,13 +21,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-zg4dxx2&1vzs$1a5up6*e(kzk$-q232ak!nk8^$=k+%cyc2(_@'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get("SECRET_KEY", "localkey2023")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# If RENDER env var is set, DEBUG is False.
+DEBUG =  'RENDER' not in os.environ
 
 ALLOWED_HOSTS = ['https://djangocheda.onrender.com', 'localhost']
-
+## Handling Allowed Hosts on Render
+## add the render.com hostname to ALLOWED_HOSTS
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -39,17 +46,21 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "cheezetypes.apps.CheezetypesConfig",
     "rest_framework",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+## Variable CORS_ALLOW_ALL_ORIGINS is set to True to allow unrestricted access to the API.
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'cheezes.urls'
 
